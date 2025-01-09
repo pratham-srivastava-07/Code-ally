@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import prismaClient from "@repo/db/client";
+import jwt from 'jsonwebtoken'
 import zod from "zod"
+import dotenv from 'dotenv'
+dotenv.config()
 
 const signUpBody = zod.object({
     username: zod.string().email(),
@@ -35,8 +38,12 @@ export default async function signupRoute(req: Request, res: Response): Promise<
             name: parsedData.data.name
         }
     })
+    const token = jwt.sign({
+        userId: newUser.id
+    }, process.env.JWT_TOKEN as string)
      res.status(200).json({
-        message: "Please verify by checking email"
+        message: "Please verify by checking email",
+        token: token
     })
     return
 }
