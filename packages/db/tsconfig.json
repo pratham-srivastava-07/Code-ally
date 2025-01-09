@@ -1,10 +1,7 @@
 {
   "extends": "@repo/typescript-config/base.json",
+  "exclude": ["node_modules"],
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "esModuleInterop": true,
-  },
-  "include": ["src", "index.ts"],
-  "exclude": ["node_modules", "dist"]
+      "outDir": "dist"
+  }
 }
