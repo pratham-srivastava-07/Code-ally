@@ -54,23 +54,74 @@ export class CodeManager {
             ws.send(JSON.stringify({type: 'error', message: 'session not found'}))
             return
         }
+        const validation = validateMessage(data);
 
+        if(!validation.isMessageValid)  {
+            ws.send(JSON.stringify({
+                type: 'error',
+                message: validation.error
+            }));
+            return;
+        }
+
+        const message = validation.message
+        
         // from where msg is coming
        try {
-        const {type, content} = JSON.parse(data)
-
-        switch(type) {
-            case "edit":
-                session.content = content
-
+         switch(message?.type) {
+            case 'cursor':
                 session.clients.forEach((client: WebSocket) => {
-                    if(client != ws || client.readyState === WebSocket.OPEN) {
-                        client.send(JSON.stringify({type: "update", content}))
+                    if(client !== ws && client.readyState === WebSocket.OPEN) {
+                        client.send(JSON.stringify({
+                            type: "cursor",
+                            position: message.position,
+                            timestamp: message.timestamp
+                        }));
                     }
-                })
-        }
+                });
+                break;
+            case 'edit':
+                session.content = message.content;
+                session.clients.forEach((client: WebSocket) => {
+                    if(client !== ws && client.readyState === WebSocket.OPEN) {
+                        client.send(JSON.stringify({
+                            type: "update",
+                            content: message.content,
+                            timestamp: message.timestamp
+                        }));
+                    }
+                });
+                break;
+         }
        } catch(e) {
         console.log(e);
        }
+    }
+
+    leaveRoom(sessionId: string, ws: WebSocket): void {
+        const session = this.sessions.get(sessionId);
+
+        if(!session) {
+            console.log("no sessionId found")
+            ws.send(JSON.stringify({type: 'error', message: 'session not found'}))
+            return
+        }
+
+        if (ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) return;
+        // remove from clients array
+        session.clients.delete(ws);
+
+        session.clients.forEach((client: WebSocket) => {
+            if(client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify({type: 'userLeft', message: 'A user has left the session'}));
+            }
+        });
+
+        ws.close()
+        // if there are no clients in the room 
+        if(session.clients.size === 0) {
+            this.sessions.delete(sessionId)  
+        }
+        
     }
 }
