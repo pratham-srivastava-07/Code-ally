@@ -1,6 +1,6 @@
 import express from "express"
 import cors from "cors" 
-import prismaClient from "@repo/db/client"
+// import prismaClient from "@repo/db/client"
 import { router } from "./routes/index.js"
 
 const app = express()
