@@ -6,4 +6,4 @@ import { createRouter } from "./create.js"
 export const router = express.Router()
 
 router.use("/user", userRouter)
-router.use("/create", authMiddleware, createRouter)
+// router.use("/create", authMiddleware, createRouter)

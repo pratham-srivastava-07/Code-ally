@@ -30,7 +30,7 @@ function isValid(type: string): type is MessageType {
     return ['error', 'cursor', 'selection', 'edit'].includes(type)
 }
 
-function validateMessage(data: string): {message?: CodeEditorMessage; error?: string; isMessageValid?: boolean} {
+export function validateMessage(data: string): {message?: CodeEditorMessage; error?: string; isMessageValid?: boolean} {
     try {
         const parsedValue = JSON.parse(data)
 

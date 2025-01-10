@@ -1,5 +1,5 @@
 import {WebSocket, WebSocketServer}  from 'ws'
-import { CodeManager } from './manager/Manager'
+import { CodeManager } from './manager/Manager.js'
 import {Request} from 'express'
 
 const wss = new WebSocketServer({port: 8080})
