@@ -11,5 +11,6 @@ export default async function createRoute(req: Request, res: Response): Promise<
             framework: framework
         }
     })
-    
+    res.status(201).json({message: "Project Created", project: newProject})
+    return;
 }

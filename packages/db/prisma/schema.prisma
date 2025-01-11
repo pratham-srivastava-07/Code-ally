@@ -19,10 +19,17 @@ model User {
   name       String  
   email      String
   passworrd  String
+  role       Role?  
 }
 
 model Projects {
   id           String    @id @default(uuid())
   projectName  String
   framework    String
+}
+
+enum Role {
+  Admin
+  Editor 
+  Viewer
 }
