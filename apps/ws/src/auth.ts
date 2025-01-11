@@ -1,13 +1,13 @@
 import { Request } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { JWT_SECRET } from "./config";
+import { JWT_SECRET } from "./config/index.js";
 import prismaClient from "@repo/db/client";
 
 interface AuthRequest extends Request {
     userId?: string
 }
 
-const authenticateSocket = async(req: AuthRequest, socket: any) => {
+const authenticateSocket = async(req: AuthRequest, socket: any): Promise<any> => {
     const token = req.cookies?.token
 
     if(!token) {

@@ -1,10 +1,15 @@
-// import { Request, Response } from "express";
+import prismaClient from "@repo/db/client";
+import { Request, Response } from "express";
 
-// export default async function createRoute(req: Request, res: Response): Promise<void> {
-//     // for getting existing data from db or just opening previously opened project
-//     const id = req.params.id
+export default async function createRoute(req: Request, res: Response): Promise<void> {
+    // takes project-name and framework as inputs 
+    const {projectName, framework} = req.body;
 
-//     if(!id) {
-//         res.status(404).json({message:  "Id not found"})
-//     }
-// }
+    const newProject = await prismaClient.projects.create({
+        data: {
+            projectName: projectName,
+            framework: framework
+        }
+    })
+    
+}

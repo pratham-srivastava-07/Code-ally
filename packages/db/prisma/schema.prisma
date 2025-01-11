@@ -20,3 +20,9 @@ model User {
   email      String
   passworrd  String
 }
+
+model Projects {
+  id           String    @id @default(uuid())
+  projectName  String
+  framework    String
+}
