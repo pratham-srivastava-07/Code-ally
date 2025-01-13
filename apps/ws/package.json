@@ -19,5 +19,8 @@
     "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
     "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "^0.0.0"
   }
 }

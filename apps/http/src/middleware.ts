@@ -27,36 +27,3 @@ export default async function authMiddleware(req: Request, res: Response, next: 
     }
 }
 
-export async function authorizeRole(allowedRoles: any[]) {
-    return async (req: Request, res: Response, next: NextFunction) => {
-        const id = req.user?.id
-
-        try {
-            if(!id || typeof id !== 'string') return res.status(401).json({message: "Invalid or missing user ID"})
-
-            const userRole = await prismaClient.user.findFirst({
-                where: {
-                    id: id
-                }, 
-                select: {
-                    role: true
-                }
-            })
-
-            if(!userRole || !userRole.role) {
-                res.status(404).json({message: "No userRole asigned"})
-                return;
-            }
-
-            if(!allowedRoles.includes(userRole?.role)) {
-                res.status(403).json({messsage: "role not recognized"})
-                return;
-            }
-            res.status(200).json({message: "role assigned!"})
-
-        } catch(e) {
-            console.error('Authorization error:', e);
-            return res.status(500).json({ message: "Error occurred during authorization", error: e });
-        }
-    }
-}
