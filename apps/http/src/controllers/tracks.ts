@@ -73,3 +73,62 @@ export async function createTrack(req: Request, res: Response): Promise<void> {
         res.status(500).json({ message: "Failed to create track" });
     }
 }
+
+
+export async function updateTrack(req: Request, res: Response): Promise<void> {
+    const {id} = req.params
+
+    try {
+        const updateTrackWithId = await prismaClient.track.update({
+            where: {
+                id: id
+            }, 
+            select: {
+                name: req.body.name,
+                bpm: req.body.bpm,
+                timeSignature: req.body.timeSignature,
+                isPublic: req.body.isPublic,
+                owner: {include: {
+                    na
+                }}
+            },
+            include: {
+                owner: true,  
+                instruments: true
+            }
+        })
+    } catch(e) {
+        console.log(e);
+    }
+}
+
+export async function  deleteTrack(req: Request, res: Response): Promise<void> {
+    const {id} = req.params
+
+    try {
+        const deleteSpecificTrack = await prismaClient.track.delete({
+            where: {
+                id: id
+            }
+        })
+
+        res.status(200).json({message: "Track deleted successfully", deletedTrack: deleteSpecificTrack})
+        return
+    } catch(e) {
+        console.log(e)
+    }
+}
+
+export async function trackBySpecificArtist(req: Request, res: Response): Promise<void> {
+    const { artistId } = req.params
+
+    try {
+        const sungBySpecificArtist = await prismaClient.track.findMany({
+            where: {
+                ownerId: artistId
+            }
+        })
+    } catch(e) {
+        console.error(e)
+    }
+}
