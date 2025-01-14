@@ -28,7 +28,7 @@ export async function getSpecificTrack(req: Request, res: Response): Promise<voi
         console.log(e);
     }
 }
-
+// creating a new track
 const trackBody = z.object({
     name: z.string(),
     bpm: z.number().default(120),
@@ -74,7 +74,7 @@ export async function createTrack(req: Request, res: Response): Promise<void> {
     }
 }
 
-
+// updating a track
 export async function updateTrack(req: Request, res: Response): Promise<void> {
     const {id} = req.params
 
@@ -82,26 +82,25 @@ export async function updateTrack(req: Request, res: Response): Promise<void> {
         const updateTrackWithId = await prismaClient.track.update({
             where: {
                 id: id
-            }, 
-            select: {
+            },
+            data: {
                 name: req.body.name,
                 bpm: req.body.bpm,
                 timeSignature: req.body.timeSignature,
                 isPublic: req.body.isPublic,
-                owner: {include: {
-                    na
-                }}
             },
             include: {
-                owner: true,  
+                owner: true,
                 instruments: true
             }
-        })
+        });
+        res.status(200).json({message: "Track updated successfully", track: updateTrackWithId})
+        return
     } catch(e) {
         console.log(e);
     }
 }
-
+// deleting a track
 export async function  deleteTrack(req: Request, res: Response): Promise<void> {
     const {id} = req.params
 
@@ -128,6 +127,8 @@ export async function trackBySpecificArtist(req: Request, res: Response): Promis
                 ownerId: artistId
             }
         })
+        res.status(200).json({message: "Track found successfully!", artist: sungBySpecificArtist})
+        return
     } catch(e) {
         console.error(e)
     }
