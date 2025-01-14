@@ -1,17 +1,5 @@
 import Redis from 'ioredis'
 
-// const redis = new Redis({
-//     host:  'localhost',
-//     port: 6379,
-//     password: ''
-// })
-
-// redis.ping().then((e) => {
-//     console.log(e);
-// }).catch((e) => {
-//     console.log(e)
-// })
-
 export class RedisManager {
     private redis: Redis;
 
@@ -48,7 +36,32 @@ export class RedisManager {
 
 
     // get a particular session
+    async getSession(sessionId: string): Promise<void> {
+        await this.redis.hgetall(`music-session: ${sessionId}`)
+        return;
+    }
+
     // active user management
+    async addActiveUser(sessionId: string, userId: string): Promise<void> {
+        await this.redis.sadd(`active users: ${sessionId}`, userId)
+        return;
+    }
+
     // pub/sub for real time events
-    // 
+    async publishEvent(channel: string, event: string): Promise<void> {
+        await this.redis.publish(channel, JSON.stringify(event));
+    }
+
+    async subscribe(channel: string, callback: (m: any) => void): Promise<void> {
+        const subscriber = this.redis.duplicate();
+        await subscriber.subscribe(channel);
+        subscriber.on('message', (channel, message) => {
+            callback(message);
+        });
+        return;
+    }
+    // getTrack state 
+    
+
+    // cleannup/ close
 }
