@@ -1,6 +1,6 @@
 import { Peer } from "./Peer"
 
-class Room {
+export class Room {
    public roomId: string;
 
    public peers: Peer[] = []

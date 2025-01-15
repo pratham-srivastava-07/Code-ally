@@ -1,6 +1,6 @@
 import Redis from 'ioredis'
 
-export class RedisManager {
+class RedisManager {
     private redis: Redis;
 
     constructor() {
@@ -60,8 +60,28 @@ export class RedisManager {
         });
         return;
     }
-    // getTrack state 
-    
+    // setTrack /  getTrack state 
+    async setTrackWithId(track: string, state: any): Promise<void> {
+        await this.redis.hset(`track ${track} connected`, state)
+        return;
+    }
+
+    async getTrackWithId(track: string): Promise<void> {
+        await this.redis.hgetall(`Track state: ${track}`)
+    }
 
     // cleannup/ close
+
+    async cleanup(sessionId: string): Promise<void> {
+        const keys = [
+            `music_session:${sessionId}`,
+            `music_notes:${sessionId}`,
+            `active_users:${sessionId}`,
+            `track_state:${sessionId}`
+        ]
+        await this.redis.del(keys);
+        return;
+    }
 }
+
+export const redisService = new RedisManager()

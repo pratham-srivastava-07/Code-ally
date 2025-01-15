@@ -34,7 +34,7 @@ export default async function signupRoute(req: Request, res: Response): Promise<
     const newUser = await prismaClient.user.create({
         data: {
             email: parsedData.data.username,
-            passworrd: parsedData.data.password,
+            password: parsedData.data.password,
             name: parsedData.data.name
         }
     })
