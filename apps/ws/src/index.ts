@@ -2,8 +2,11 @@ import {WebSocket, WebSocketServer}  from 'ws'
 import { CodeManager } from './manager/Manager.js'
 import {Request} from 'express'
 import authenticateSocket from './auth.js'
+import { Room } from './manager/Room.js'
 
 const wss = new WebSocketServer({port: 8080})
+
+// const room = new Room("")
 
 const codeManager = new CodeManager
 

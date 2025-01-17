@@ -47,6 +47,11 @@ class RedisManager {
         return;
     }
 
+    async removeActiveUser(sessionId: string, userId: string): Promise<void> {
+        await this.redis.srem(`music session: ${sessionId}`, userId);
+        return;
+    }
+
     // pub/sub for real time events
     async publishEvent(channel: string, event: string): Promise<void> {
         await this.redis.publish(channel, JSON.stringify(event));
