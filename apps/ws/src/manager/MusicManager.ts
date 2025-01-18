@@ -112,7 +112,36 @@ export class MusicManager {
         const message = validate.message
         try {
             switch(message?.type) {
-                
+                case 'cursor':
+                    session.clients.forEach((client: WebSocket) => {
+                        if(client !== ws && client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify({
+                                type: "cursor",
+                                position: message.position,
+                                timestamp: message.timestamp
+                            }));
+                        }
+                    });
+                    break;
+                case 'track':
+                    const musicId = message.trackId;
+                    session.clients.forEach((client: WebSocket) => {
+                        if(client !== ws && client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify({
+                                type: 'track',
+                                trackId: musicId,
+                                timestamp: message.timestamp
+                            }))
+                        }
+                    })
+                    break;
+                case 'error':
+                    session.clients.forEach((ws: WebSocket) => {
+                        ws.send(JSON.stringify("Message error: Message not delivered properly"))
+                    })
+                    break;
+                default:
+                    console.log('default case in switch case')
             }
         } catch(e) {
             console.log(e)
