@@ -1,27 +1,40 @@
-import {WebSocket, WebSocketServer}  from 'ws'
-import { CodeManager } from './manager/Manager.js'
-import {Request} from 'express'
-import authenticateSocket from './auth.js'
-import { Room } from './manager/Room.js'
+import { WebSocket, WebSocketServer } from 'ws';
+import { CodeManager } from './manager/Manager.js';
+import { Request } from 'express';
+import authenticateSocket from './auth.js';
 
-const wss = new WebSocketServer({port: 8080})
+const wss = new WebSocketServer({ port: 8080 });
 
-// const room = new Room("")
-
-const codeManager = new CodeManager
+const codeManager = new CodeManager();
 
 wss.on('connection', async (ws: WebSocket, req: Request) => {
-    console.log('Connected')
+    console.log(`New connection from ${req.socket.remoteAddress}`);
 
-    ws.on('error',()=> console.error('error'))
-    const url = new URL(req.url || "", `http://${req.headers.host}`);
+    ws.send('Connection established');
+    console.log('Client connected successfully');
 
-    const sessionId = url.searchParams.get('sessionId')
+    ws.on('error', (err) => console.error('WebSocket error:', err));
 
-    if(!sessionId) return;
+    const url = new URL(req.url || '/', `http://${req.headers.host}`);
+    const sessionId = url.searchParams.get('sessionId');
 
-    if(sessionId && await authenticateSocket(req, ws)) {
-        codeManager.joinRoom(sessionId, ws)
+    if (!sessionId) {
+        console.warn('Client connected without a session ID');
+        return;
     }
-    ws.on('close', () => codeManager.leaveRoom(sessionId, ws))
-})
+
+    console.log(`Session ID: ${sessionId}`);
+
+    if (await authenticateSocket(req, ws)) {
+        console.log(`Client authenticated for session: ${sessionId}`);
+        codeManager.joinRoom(sessionId, ws);
+    } else {
+        console.warn(`Authentication failed for session: ${sessionId}`);
+        ws.close();
+    }
+
+    ws.on('close', () => {
+        console.log(`Client disconnected from session: ${sessionId}`);
+        codeManager.leaveRoom(sessionId, ws);
+    });
+});
