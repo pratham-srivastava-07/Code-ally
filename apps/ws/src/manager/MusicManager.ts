@@ -1,6 +1,7 @@
 import {redisService} from '../redis'
 import { WebSocket } from 'ws';
 import {v4 as uuidv4} from 'uuid'
+import { validateMusicMessage } from '../helper/MusicHelper';
 
 interface MusicSession {
     sessionId: string;
@@ -21,7 +22,7 @@ interface NoteEvent {
     instrumentId: string;
 }
 
-class MusicManager {
+export class MusicManager {
     private sessions: Map<string, MusicSession>
 
     constructor() {
@@ -90,6 +91,32 @@ class MusicManager {
         // ws.on('close', () => this.leaveRoom(sessionId, ws))
 
 
+    }
+
+    async handleMessage(sessionId: any, ws: WebSocket, data: any): Promise<void> {
+        const session = this.sessions.get(sessionId);
+
+        if(!session) {
+            ws.send(JSON.stringify("sessionId not found"))
+            return;
+        }
+        const validate = validateMusicMessage(data);
+        
+        if(!validate.isValid) {
+            ws.send(JSON.stringify({
+                type: 'error',
+                message: validate.error
+            }));
+            return;
+        }
+        const message = validate.message
+        try {
+            switch(message?.type) {
+                
+            }
+        } catch(e) {
+            console.log(e)
+        }
     }
     
 
