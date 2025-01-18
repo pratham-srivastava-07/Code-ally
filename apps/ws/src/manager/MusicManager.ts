@@ -62,7 +62,7 @@ export class MusicManager {
             ws.send(JSON.stringify({ type: "error", message: "Session not found" }));
             return;
         }
-
+    
 
         const clientId = uuidv4()
         // (ws as any).clientId = clientId
@@ -87,10 +87,31 @@ export class MusicManager {
         }, ws);
     
         // Set up message handler
-        // ws.on('message', (data: any) => this.handleMessage(sessionId, ws, data));
-        // ws.on('close', () => this.leaveRoom(sessionId, ws))
+        ws.on('message', (data: any) => this.handleMessage(sessionId, ws, data));
+        ws.on('close', () => this.leaveRoom(sessionId, ws))
 
 
+    }
+
+    async leaveRoom(sessionId: string, ws: WebSocket): Promise<void> {
+        const session = this.sessions.get(sessionId);
+
+        if(!session) {
+            ws.send(JSON.stringify("No sessionId found"))
+            return;
+        }
+
+        session.clients.delete(ws);
+
+        await redisService.removeActiveUser(sessionId, ws.id)
+
+        session.clients.forEach((client: WebSocket) => {
+            if(client.readyState !== WebSocket.OPEN && client !== ws) {
+                client.send(JSON.stringify(`${ws.id} left the room`))
+            }
+        })
+
+        return;
     }
 
     async handleMessage(sessionId: any, ws: WebSocket, data: any): Promise<void> {
