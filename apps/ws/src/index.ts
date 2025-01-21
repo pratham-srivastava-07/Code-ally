@@ -25,13 +25,13 @@ wss.on('connection', async (ws: WebSocket, req: Request) => {
 
     console.log(`Session ID: ${sessionId}`);
 
-    if (await authenticateSocket(req, ws)) {
-        console.log(`Client authenticated for session: ${sessionId}`);
-        codeManager.joinRoom(sessionId, ws);
-    } else {
-        console.warn(`Authentication failed for session: ${sessionId}`);
-        ws.close();
-    }
+    // if (await authenticateSocket(req, ws)) {
+    //     console.log(`Client authenticated for session: ${sessionId}`);
+    //     codeManager.joinRoom(sessionId, ws);
+    // } else {
+    //     console.warn(`Authentication failed for session: ${sessionId}`);
+    //     ws.close();
+    // }
 
     ws.on('close', () => {
         console.log(`Client disconnected from session: ${sessionId}`);
